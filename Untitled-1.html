@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <script src="./jquery-3.4.1.min.js"></script>
+    <script src="./vconsole.min.js"></script>
     <title>适配移动端的拖动效果</title>
     <style>
         *{
@@ -22,6 +23,7 @@
 <body>
     <div id="suspendBall" ></div>
 <script>
+    var vConsole = new VConsole();
     var preventBall1;//进入页面后，3s内移动球，则阻止球淡化，用于clearTimeout
     var preventBall2;//移动球之后，3s内又移动，则阻止球淡化，用于clearTimeout
     preventBall1 = setTimeout(function(){
