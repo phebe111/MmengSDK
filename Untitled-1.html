@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script src="http://libs.baidu.com/jquery/2.1.4/jquery.min.js"></script>
+    <title>适配移动端的拖动效果</title>
+    <style>
+        *{
+            touch-action: pan-y;
+        }
+        #suspendBall{
+            position: absolute;
+            top:0;
+            left:0px;
+            width: 100px;
+            height: 100px;
+            background: #000000;
+            border-radius: 100px;
+        }
+    </style>
+</head>
+<body>
+    <div id="suspendBall" ></div>
+<script>
+    var preventBall1;//进入页面后，3s内移动球，则阻止球淡化，用于clearTimeout
+    var preventBall2;//移动球之后，3s内又移动，则阻止球淡化，用于clearTimeout
+    preventBall1 = setTimeout(function(){
+        ballFadeout();
+    }, 3000);
+    
+    var flag = false;//鼠标|手指是否按下的标记
+    var cur = {//记录鼠标|手指按下时的坐标
+        x:0,
+        y:0
+    }
+    var nx,ny,dx,dy,x,y ;
+    var screenH = document.body.clientHeight;
+    var screenW = document.body.clientWidth;
+    //按下时的函数
+    function down(){
+        $("#suspendBall").css({"transform":"translateX(0px)","background":"rgba(0,0,0,1)"})//先回原位
+        clearTimeout(preventBall1);//3s内按下球，则取消球淡化
+        clearTimeout(preventBall2);//3s内按下球，则取消球淡化
+        flag = true;//确认鼠标|手指按下
+        var touch ;
+        if(event.touches){
+            touch = event.touches[0];//多个鼠标|手指事件取第一个
+        }else {
+            touch = event;
+        }
+        cur.x = touch.clientX; //记录鼠标|手指当前的x坐标
+        cur.y = touch.clientY;//记录鼠标|手指当前的y坐标
+        dx = suspend.offsetLeft;//记录div当时的左偏移量
+        dy = suspend.offsetTop;//记录div的上偏移量
+        console.log(cur.x +"-"+ "-"+dx+"-"+"-"+x+"-"+y+"-"+nx+"-"+ny)
+    }
+    function move(){
+        if(flag){//如果是鼠标|手指按下则继续执行
+            var touch ;
+            if(event.touches){
+                touch = event.touches[0];
+            }else {
+                touch = event;
+            }
+            nx = touch.clientX - cur.x;//记录在鼠标|手指x轴移动的数据
+            ny = touch.clientY - cur.y;//记录在鼠标|手指y轴移动的数据
+            x = dx+nx; //div在x轴的偏移量加上鼠标|手指在x轴移动的距离
+            y = dy+ny; //div在y轴的偏移量加上鼠标|手指在y轴移动的距离
+            suspend.style.left = x+"px";
+            suspend.style.top = y +"px";
+            //阻止页面的滑动默认事件
+            document.addEventListener("touchmove",function(){
+                event.preventDefault();
+            },false);
+        }
+    }
+    //鼠标|手指释放时候的函数
+    function end(){
+        console.log(screenW)
+        flag = false; //鼠标|手指释放
+        if(x <= (screenW/2-50)){//50为悬浮球的半径
+            x = 0; //div在x轴的偏移量加上鼠标|手指在x轴移动的距离           
+        }else{
+            x = screenW;
+        }
+        y = dy+ny; //div在y轴的偏移量加上鼠标|手指在y轴移动的距离
+        suspend.style.left = x+"px";
+        suspend.style.top = y +"px";
+        preventBall2 = setTimeout(function(){
+            ballFadeout()
+        }, 3000);
+    }
+    var suspend = document.getElementById("suspendBall");
+    suspend.addEventListener("mousedown",function(){
+        down();
+    },false);
+    suspend.addEventListener("touchstart",function(){
+        down();
+    },false)
+    suspend.addEventListener("mousemove",function(){
+        move();
+    },false);
+    suspend.addEventListener("touchmove",function(){
+        move();
+    },false)
+    suspend.addEventListener("mouseup",function(){
+        end();
+    },false);
+    suspend.addEventListener("touchend",function(){
+        end();
+    },false);
+
+    function ballFadeout(){
+        if(suspend.style.left == 0 || suspend.style.left == '0px' ){//左侧吸附,50为半径
+            $("#suspendBall").css({"transform":"translateX(-50px)","background":"rgba(0,0,0,0.6)"})
+        }else{//右侧吸附,50为半径
+            $("#suspendBall").css({"transform":"translateX(50px)","background":"rgba(0,0,0,0.6)"})
+        }
+    }
+
+    function openUserCenter(){
+        console.log("--------------------")
+    }
+</script>
+</body>
+</html>
